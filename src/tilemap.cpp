@@ -11,12 +11,13 @@
 
 Tilemap::Tilemap()
 {
-    this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Tilemap");
+    this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Tilemap", sf::Style::Fullscreen);
     if (this->window == nullptr)
         throw std::runtime_error("Error opening window");
     this->window->setFramerateLimit(30);
     this->initTexture();
     this->initSprites();
+    this->initBack();
 }
 
 Tilemap::~Tilemap()
@@ -28,10 +29,9 @@ void Tilemap::run()
 {
     while (this->window->isOpen()) {
         this->window->clear(sf::Color::Black);
-        sf::Sprite spr;
-        spr.setTexture(*(this->texture));
-        this->window->draw(spr);
+        this->drawBack();
         this->drawMap();
+        this->window->display();
         if (this->eventHandler() == 1)
             return;
     }
@@ -71,7 +71,23 @@ void Tilemap::initSprites()
 {
     for (unsigned int y = 0; y < NB_ROW; y++) {
         for (unsigned int x = 0; x < NB_COL; x++) {
-            tile[y][x] = new Tile(std::array<unsigned int, 2>{x, y}, 1, 0, false, *this->texture);
+            tile[y][x] = new Tile(std::array<unsigned int, 2>{x, y}, rand() % 7 + 1, rand() % 3, 0, false, *this->texture);
         }
     }
+}
+
+void Tilemap::initBack()
+{
+    this->bg_tex = new sf::Texture;
+    if (!this->bg_tex->loadFromFile(BACKGROUND_FILE))
+        throw std::runtime_error("Error loading background file");
+
+    this->bg_spr = new sf::Sprite;
+    this->bg_spr->setTexture(*this->bg_tex);
+
+}
+
+void Tilemap::drawBack()
+{
+    this->window->draw(*this->bg_spr);
 }
