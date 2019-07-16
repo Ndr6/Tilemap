@@ -18,6 +18,7 @@ Tilemap::Tilemap()
     this->initTexture();
     this->initSprites();
     this->initBack();
+    this->editor = new Editor(&this->tile, this->texture);
 }
 
 Tilemap::~Tilemap()
@@ -31,9 +32,11 @@ void Tilemap::run()
         this->window->clear(sf::Color::Black);
         this->drawBack();
         this->drawMap();
-        this->window->display();
-        if (this->eventHandler() == 1)
+        if (this->editor->get_status())
+            this->editor->handler(this->window);
+        else if (this->eventHandler() == 1)
             return;
+        this->window->display();
     }
 }
 
@@ -41,10 +44,17 @@ void Tilemap::drawMap()
 {
     for (unsigned int y = 0; y < NB_ROW; y++) {
         for (unsigned int x = 0; x < NB_COL; x++) {
-            std::cout << "Drawing [" << y << ", " << x << "]" << std::endl;
             tile[y][x]->draw(this->window);
         }
     }
+}
+
+int Tilemap::keyboardHandler(sf::Event event)
+{
+    if (event.key.code == sf::Keyboard::E) {
+        this->editor->enable();
+    }
+    return 0;
 }
 
 int Tilemap::eventHandler()
@@ -55,6 +65,9 @@ int Tilemap::eventHandler()
         if (event.type == sf::Event::Closed) {
             std::cout << "Closing window" << std::endl;
             return 1;
+        }
+        if (event.type == sf::Event::KeyPressed) {
+            return Tilemap::keyboardHandler(event);
         }
     }
     return 0;
@@ -71,7 +84,7 @@ void Tilemap::initSprites()
 {
     for (unsigned int y = 0; y < NB_ROW; y++) {
         for (unsigned int x = 0; x < NB_COL; x++) {
-            tile[y][x] = new Tile(std::array<unsigned int, 2>{x, y}, rand() % 7 + 1, rand() % 3, 0, false, *this->texture);
+            tile[y][x] = new Tile(std::array<unsigned int, 2>{x, y}, 0, 0, 0, false, *this->texture);
         }
     }
 }

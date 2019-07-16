@@ -9,7 +9,8 @@ NAME	=	tilemap
 
 MSRC	=	src/main.cpp
 SRC		=	src/tilemap.cpp \
-			src/tile.cpp
+			src/tile.cpp \
+			src/editor.cpp
 
 MOBJ	=	$(MSRC:.cpp=.o)
 OBJ		=	$(SRC:.cpp=.o)
